@@ -1,34 +1,44 @@
+import os
 
-import streamlit as st
 import requests
+import streamlit as st
+from dotenv import load_dotenv
 
-url = 'http://127.0.0.1:8000/translate'
+load_dotenv(override=True)
+
+BASE_URL = os.getenv("BASE_URL")
 
 text = st.text_area("Enter Text")
-lang = st.text_input(label= "Languages that wanna translate to",placeholder='e.g en, fr, de')
-lang = lang.split(',')
-data = {
-    'text' : text,
-    'languages' : lang
-}
+lang = st.text_input(
+    label="Languages that wanna translate to", placeholder="e.g en, fr, de"
+)
 
-models_btn = st.button('Translate')
-if models_btn:
-    res = response = requests.post(url, json=data)
-    heloo = str(res.json())
-    st.write(heloo)
+lang = lang.split(",")
+data = {"text": text, "languages": lang}
 
-# st.text_input("Check Transition ID", placeholder='Enter translation id')
-# col1, col2 = st.columns(2)
+models_btn = st.button("Translate")
+with st.spinner("Translating.....") as spinner:
+    if models_btn:
+        try:
+            res = requests.post(f"{BASE_URL}translate", json=data)
+            heloo = res.json()
+            st.write(f'Your translation ID is: *{heloo.get('task_id')}*')
+        except Exception as e:
+            st.error(f"Error fetching translation API: {e}")
 
-# with col1:
-#     check_status_btn = col1.button('Check Status', key='status')
 
-# with col2:
-#     check_translation_btn = col2.button('Check Translation', key='translation')
+translation_id = st.text_input(
+    "Check Transition ID", placeholder="Enter translation id"
+)
+check_status_btn = st.button("Check Status", key="status")
 
-# if check_status_btn:
-#     st.write("Status button clicked")
-
-# if check_translation_btn:
-#     st.write("Translation button clicked")
+if check_status_btn:
+    try:
+        url = f"{BASE_URL}translation/{translation_id}"
+        res = requests.get(url)
+        if res.status_code == 200:
+            st.write(res.json()["translations"])
+        if res.status_code == 404:
+            st.write(f'Translation ID: *{translation_id}* doesn"t exist')
+    except Exception as e:
+        st.error(f"error processing translation {e}")
