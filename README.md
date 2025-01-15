@@ -26,7 +26,7 @@ This application leverages OpenAI/Gemini to provide real-time translation of doc
 ```bash
 git clone https://github.com/p-sumann/realtime_translation.git
 
-cd fastapi-translation-service
+cd realtime_translation
 ```
 
 2. Install dependencies:
@@ -67,7 +67,7 @@ Translates text between languages.
 ```
 
 #### GET /translation/{task_id}
-Returns translated version of give text.
+Returns translated version of given text.
 
 ## 🛠️ Tech Stack
 
